@@ -7,10 +7,10 @@ Vue.use(Router)
 import Layout from '@/layout'
 
 /* Router Modules */
-import componentsRouter from './modules/components'
-import chartsRouter from './modules/charts'
-import tableRouter from './modules/table'
-import nestedRouter from './modules/nested'
+// import componentsRouter from './modules/components'
+// import chartsRouter from './modules/charts'
+// import tableRouter from './modules/table'
+// import nestedRouter from './modules/nested'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -82,45 +82,6 @@ export const constantRoutes = [
         meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
       }
     ]
-  },
-  {
-    path: '/documentation',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/documentation/index'),
-        name: 'Documentation',
-        meta: { title: 'Documentation', icon: 'documentation', affix: true }
-      }
-    ]
-  },
-  {
-    path: '/guide',
-    component: Layout,
-    redirect: '/guide/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/guide/index'),
-        name: 'Guide',
-        meta: { title: 'Guide', icon: 'guide', noCache: true }
-      }
-    ]
-  },
-  {
-    path: '/profile',
-    component: Layout,
-    redirect: '/profile/index',
-    hidden: true,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/profile/index'),
-        name: 'Profile',
-        meta: { title: 'Profile', icon: 'user', noCache: true }
-      }
-    ]
   }
 ]
 
@@ -129,47 +90,6 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
-  {
-    path: '/permission',
-    component: Layout,
-    redirect: '/permission/page',
-    alwaysShow: true, // will always show the root menu
-    name: 'Permission',
-    meta: {
-      title: 'Permission',
-      icon: 'lock',
-      roles: ['admin', 'editor'] // you can set roles in root nav
-    },
-    children: [
-      {
-        path: 'page',
-        component: () => import('@/views/permission/page'),
-        name: 'PagePermission',
-        meta: {
-          title: 'Page Permission',
-          roles: ['admin'] // or you can only set roles in sub nav
-        }
-      },
-      {
-        path: 'directive',
-        component: () => import('@/views/permission/directive'),
-        name: 'DirectivePermission',
-        meta: {
-          title: 'Directive Permission'
-          // if do not set roles, means: this page does not require permission
-        }
-      },
-      {
-        path: 'role',
-        component: () => import('@/views/permission/role'),
-        name: 'RolePermission',
-        meta: {
-          title: 'Role Permission',
-          roles: ['admin']
-        }
-      }
-    ]
-  },
 
   {
     path: '/icon',
@@ -185,60 +105,182 @@ export const asyncRoutes = [
   },
 
   /** when your routing map is too long, you can split it into small modules **/
-  componentsRouter,
-  chartsRouter,
-  nestedRouter,
-  tableRouter,
-
   {
-    path: '/example',
+    path: '/comic-cont',
     component: Layout,
-    redirect: '/example/list',
-    name: 'Example',
+    redirect: '/comic-cont/category',
+    name: '内容中心',
     meta: {
-      title: 'Example',
-      icon: 'example'
+      title: '内容中心',
+      icon: 'table'
     },
     children: [
       {
-        path: 'create',
-        component: () => import('@/views/example/create'),
-        name: 'CreateArticle',
-        meta: { title: 'Create Article', icon: 'edit' }
+        path: 'category/create',
+        component: () => import('@/views/comic-cont/category-add'),
+        name: 'categoryCreate',
+        hidden: true,
+        meta: { title: '添加分类', icon: 'edit' }
       },
       {
-        path: 'edit/:id(\\d+)',
-        component: () => import('@/views/example/edit'),
-        name: 'EditArticle',
-        meta: { title: 'Edit Article', noCache: true, activeMenu: '/example/list' },
+        path: 'category/edit/:id(\\d+)',
+        component: () => import('@/views/comic-cont/category-add'),
+        name: 'categoryEdit',
+        meta: { title: '编辑分类', noCache: true, activeMenu: '/comic-cont/category' },
         hidden: true
       },
       {
-        path: 'list',
-        component: () => import('@/views/example/list'),
-        name: 'ArticleList',
-        meta: { title: 'Article List', icon: 'list' }
+        path: 'category',
+        component: () => import('@/views/comic-cont/category'),
+        name: 'categoryList',
+        meta: { title: '分类', icon: 'list' }
+      },
+      {
+        path: 'tag/create',
+        component: () => import('@/views/comic-cont/tag-add'),
+        name: 'tagCreate',
+        hidden: true,
+        meta: { title: '添加标签', icon: 'edit' }
+      },
+      {
+        path: 'tag/edit/:id(\\d+)',
+        component: () => import('@/views/comic-cont/tag-add'),
+        name: 'tagEdit',
+        meta: { title: '编辑标签', noCache: true, activeMenu: '/comic-cont/tag-add' },
+        hidden: true
+      },
+      {
+        path: 'tag',
+        component: () => import('@/views/comic-cont/tag'),
+        name: 'tagList',
+        meta: { title: '标签', icon: 'list' }
+      },
+      {
+        path: 'comic/create',
+        component: () => import('@/views/comic-cont/comic-add'),
+        name: 'comicCreate',
+        hidden: true,
+        meta: { title: '添加漫画', icon: 'edit' }
+      },
+      {
+        path: 'comic/edit/:id(\\d+)',
+        component: () => import('@/views/comic-cont/comic-add'),
+        name: 'comicEdit',
+        meta: { title: '编辑漫画', noCache: true, activeMenu: '/comic-cont/comic-add' },
+        hidden: true
+      },
+      {
+        path: 'comic',
+        component: () => import('@/views/comic-cont/comic'),
+        name: 'comicList',
+        meta: { title: '漫画中心', icon: 'list' }
       }
     ]
   },
-
   {
-    path: '/tab',
+    path: '/comic-user',
     component: Layout,
+    redirect: '/comic-user/index',
+    name: '用户中心',
+    meta: {
+      title: '用户中心',
+      icon: 'table'
+    },
     children: [
       {
+        path: 'detail',
+        component: () => import('@/views/comic-user/detail'),
+        name: 'comic-user-detail',
+        hidden: true,
+        meta: { title: '用户详情', icon: 'edit' }
+      },
+      {
         path: 'index',
-        component: () => import('@/views/tab/index'),
-        name: 'Tab',
-        meta: { title: 'Tab', icon: 'tab' }
+        component: () => import('@/views/comic-user/index'),
+        name: 'comic-user',
+        meta: { title: '用户中心', icon: 'list' }
       }
     ]
   },
-
+  {
+    path: '/comic-account',
+    component: Layout,
+    redirect: '/comic-account/index',
+    name: '账户中心',
+    meta: {
+      title: '账户中心',
+      icon: 'table'
+    },
+    children: [
+      {
+        path: 'recharge',
+        component: () => import('@/views/comic-account/recharge'),
+        name: 'comic-account-recharge',
+        meta: { title: '充值记录', icon: 'list' }
+      },
+      {
+        path: 'withdrawal',
+        component: () => import('@/views/comic-account/withdrawal'),
+        name: 'comic-account-withdrawal',
+        meta: { title: '提现记录', icon: 'list' }
+      }
+    ]
+  },
+  {
+    path: '/comic-sale',
+    component: Layout,
+    redirect: '/comic-sale/index',
+    name: '营销中心',
+    meta: {
+      title: '营销中心',
+      icon: 'table'
+    },
+    children: [
+      {
+        path: 'add',
+        component: () => import('@/views/comic-sale/add'),
+        name: 'comic-sale-add',
+        hidden: true,
+        meta: { title: '新增', icon: 'edit' }
+      },
+      {
+        path: 'index',
+        component: () => import('@/views/comic-sale/index'),
+        name: 'comic-sale',
+        meta: { title: '营销列表', icon: 'list' }
+      }
+    ]
+  },
+  {
+    path: '/comic-setting',
+    component: Layout,
+    redirect: '/comic-setting/index',
+    name: '设置中心',
+    meta: {
+      title: '设置中心',
+      icon: 'table'
+    },
+    children: [
+      {
+        path: 'invite',
+        component: () => import('@/views/comic-setting/invite'),
+        name: 'comic-setting-invite',
+        hidden: true,
+        meta: { title: '邀请人规则', icon: 'edit' }
+      },
+      {
+        path: 'price',
+        component: () => import('@/views/comic-setting/price'),
+        name: 'comic-setting',
+        meta: { title: '漫币等价规则', icon: 'list' }
+      }
+    ]
+  },
   {
     path: '/error',
     component: Layout,
     redirect: 'noRedirect',
+    hidden: true,
     name: 'ErrorPages',
     meta: {
       title: 'Error Pages',
@@ -259,130 +301,6 @@ export const asyncRoutes = [
       }
     ]
   },
-
-  {
-    path: '/error-log',
-    component: Layout,
-    children: [
-      {
-        path: 'log',
-        component: () => import('@/views/error-log/index'),
-        name: 'ErrorLog',
-        meta: { title: 'Error Log', icon: 'bug' }
-      }
-    ]
-  },
-
-  {
-    path: '/excel',
-    component: Layout,
-    redirect: '/excel/export-excel',
-    name: 'Excel',
-    meta: {
-      title: 'Excel',
-      icon: 'excel'
-    },
-    children: [
-      {
-        path: 'export-excel',
-        component: () => import('@/views/excel/export-excel'),
-        name: 'ExportExcel',
-        meta: { title: 'Export Excel' }
-      },
-      {
-        path: 'export-selected-excel',
-        component: () => import('@/views/excel/select-excel'),
-        name: 'SelectExcel',
-        meta: { title: 'Export Selected' }
-      },
-      {
-        path: 'export-merge-header',
-        component: () => import('@/views/excel/merge-header'),
-        name: 'MergeHeader',
-        meta: { title: 'Merge Header' }
-      },
-      {
-        path: 'upload-excel',
-        component: () => import('@/views/excel/upload-excel'),
-        name: 'UploadExcel',
-        meta: { title: 'Upload Excel' }
-      }
-    ]
-  },
-
-  {
-    path: '/zip',
-    component: Layout,
-    redirect: '/zip/download',
-    alwaysShow: true,
-    name: 'Zip',
-    meta: { title: 'Zip', icon: 'zip' },
-    children: [
-      {
-        path: 'download',
-        component: () => import('@/views/zip/index'),
-        name: 'ExportZip',
-        meta: { title: 'Export Zip' }
-      }
-    ]
-  },
-
-  {
-    path: '/pdf',
-    component: Layout,
-    redirect: '/pdf/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/pdf/index'),
-        name: 'PDF',
-        meta: { title: 'PDF', icon: 'pdf' }
-      }
-    ]
-  },
-  {
-    path: '/pdf/download',
-    component: () => import('@/views/pdf/download'),
-    hidden: true
-  },
-
-  {
-    path: '/theme',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/theme/index'),
-        name: 'Theme',
-        meta: { title: 'Theme', icon: 'theme' }
-      }
-    ]
-  },
-
-  {
-    path: '/clipboard',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/clipboard/index'),
-        name: 'ClipboardDemo',
-        meta: { title: 'Clipboard', icon: 'clipboard' }
-      }
-    ]
-  },
-
-  {
-    path: 'external-link',
-    component: Layout,
-    children: [
-      {
-        path: 'https://github.com/PanJiaChen/vue-element-admin',
-        meta: { title: 'External Link', icon: 'link' }
-      }
-    ]
-  },
-
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]
