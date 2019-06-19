@@ -170,6 +170,27 @@ export const asyncRoutes = [
         hidden: true
       },
       {
+        path: 'section/:id(\\d+)',
+        component: () => import('@/views/comic-cont/section'),
+        name: 'sectionList',
+        meta: { title: '章节列表', noCache: true, activeMenu: '/comic-cont/comic-add' },
+        hidden: true
+      },
+      {
+        path: 'section/add',
+        component: () => import('@/views/comic-cont/section-add'),
+        name: 'sectionEdit',
+        meta: { title: '章节新增', noCache: true, activeMenu: '/comic-cont/section' },
+        hidden: true
+      },
+      {
+        path: 'section/edit/:id(\\d+)',
+        component: () => import('@/views/comic-cont/section-add'),
+        name: 'sectionEdit',
+        meta: { title: '章节编辑', noCache: true, activeMenu: '/comic-cont/comic-add' },
+        hidden: true
+      },
+      {
         path: 'comic',
         component: () => import('@/views/comic-cont/comic'),
         name: 'comicList',
@@ -262,17 +283,16 @@ export const asyncRoutes = [
     },
     children: [
       {
-        path: 'invite',
-        component: () => import('@/views/comic-setting/invite'),
-        name: 'comic-setting-invite',
-        hidden: true,
-        meta: { title: '邀请人规则', icon: 'edit' }
-      },
-      {
         path: 'price',
         component: () => import('@/views/comic-setting/price'),
         name: 'comic-setting',
-        meta: { title: '漫币等价规则', icon: 'list' }
+        meta: { title: '漫币等价规则', icon: 'edit', noCache: true }
+      },
+      {
+        path: 'invite',
+        component: () => import('@/views/comic-setting/invite'),
+        name: 'comic-setting-invite',
+        meta: { title: '邀请人规则', icon: 'edit' }
       }
     ]
   },

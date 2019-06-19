@@ -30,30 +30,33 @@
           <span>{{ scope.row.gmtCreate }}</span>
         </template>
       </el-table-column> -->
-      <el-table-column label="分类名称" min-width="150px">
+      <el-table-column label="名称" min-width="150px">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="排序" width="110px" align="center">
+      <el-table-column label="第几章节" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.sort }}</span>
+          <span>{{ scope.row.cover }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="是否可用" class-name="status-col" width="100">
+      <el-table-column label="是否上架" class-name="status-col" width="100">
         <template slot-scope="{row}">
-          <el-tag :type="row.enable | statusFilter">
-            {{ row.enable ? '可用' : '不可用' }}
+          <el-tag :type="row.listing | statusFilter">
+            {{ row.listing ? '是' : '否' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" width="430" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,'deleted')">
+          <el-button size="mini" type="danger" @click="handleDelete(row,'deleted')">
             删除
+          </el-button>
+          <el-button type="warning" size="mini" @click="handleUpdate(row)">
+            下架
           </el-button>
         </template>
       </el-table-column>
@@ -63,15 +66,19 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="分类名称" prop="name">
+        <el-form-item label="标题" prop="name">
           <el-input v-model="temp.name" />
         </el-form-item>
-        <el-form-item label="排序" prop="sort">
+        <el-form-item label="第几章节" prop="sort">
           <el-input v-model="temp.sort" />
         </el-form-item>
-        <el-form-item label="是否可用" prop="sort">
+        <el-form-item label="章节费用" prop="sort">
+          <el-input v-model="temp.sort" />
+        </el-form-item>
+        <el-form-item label="是否上架" prop="sort">
           <el-switch v-model="temp.enable" active-color="#13ce66" inactive-color="#ff4949" />
         </el-form-item>
+        <tinymce v-model="temp.comment" :height="960" />
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -96,8 +103,9 @@
 </template>
 
 <script>
-import { categorySearch, categoryAdd, categorySet, categoryDel } from '@/api/manhua'
+import { sectionSearch, sectionAdd, sectionSet, sectionDel } from '@/api/manhua'
 import waves from '@/directive/waves' // waves directive
+import Tinymce from '@/components/Tinymce'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 const calendarTypeOptions = [
@@ -114,8 +122,8 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 }, {})
 
 export default {
-  name: 'ComplexTable',
-  components: { Pagination },
+  name: 'SectionList',
+  components: { Pagination, Tinymce },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -170,12 +178,13 @@ export default {
     }
   },
   created() {
-    this.getList()
+    this.getList(this.$route.params.id)
   },
   methods: {
-    getList() {
+    getList(id) {
       this.listLoading = true
-      categorySearch({
+      sectionSearch({
+        bookId: id,
         pageNo: this.listQuery.page,
         pageSize: this.listQuery.limit
       }).then(response => {
@@ -221,12 +230,7 @@ export default {
       }
     },
     handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
+      this.$router.push('/comic-cont/section/add')
     },
     handleDelete(row) {
       this.$confirm('是否确认删除', '提示', {
@@ -234,7 +238,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        categoryDel({ id: row.id }).then(() => {
+        sectionDel({ id: row.id }).then(() => {
           this.refresh()
           this.$notify({
             title: 'Success',
@@ -248,7 +252,8 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          categoryAdd(this.temp).then(() => {
+          console.log('this.temp', this.temp)
+          sectionAdd(this.temp).then(() => {
             this.refresh()
             this.dialogFormVisible = false
             this.$notify({
@@ -274,7 +279,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          categorySet(tempData).then(() => {
+          sectionSet(tempData).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
                 const index = this.list.indexOf(v)

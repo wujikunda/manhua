@@ -185,7 +185,11 @@ aside {
 .multiselect {
   line-height: 16px;
 }
-
+.user-header{
+  max-width: 70px;
+  max-height: 70px;
+  border-radius: 50%;
+}
 .multiselect--active {
   z-index: 1000 !important;
 }

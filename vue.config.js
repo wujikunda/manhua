@@ -42,6 +42,14 @@ module.exports = {
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: ''
         }
+      },
+      '/admin': {
+        target: 'http://47.111.176.39:8100',
+        changeOrigin: true,
+        secure: false,
+        headers: {
+          Referer: 'http://47.111.176.39:8100'
+        }
       }
     },
     after: require('./mock/mock-server.js')
