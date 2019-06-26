@@ -30,14 +30,15 @@
           <span>{{ scope.row.gmtCreate }}</span>
         </template>
       </el-table-column> -->
-      <el-table-column label="名称" min-width="150px">
+      <el-table-column label="名称" width="140px">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="封面" width="110px" align="center">
+      <el-table-column label="封面" min-width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.cover }}</span>
+          <img style="width: 150px" :src="scope.row.cover" @error="loadError">
+          <!-- <span>{{ scope.row.cover }}</span> -->
         </template>
       </el-table-column>
       <el-table-column label="是否上架" class-name="status-col" width="100">
@@ -55,8 +56,11 @@
           <el-button size="mini" type="danger" @click="handleDelete(row,'deleted')">
             删除
           </el-button>
-          <el-button type="warning" size="mini" @click="handleUpdate(row)">
+          <el-button v-if="row.listing" type="warning" size="mini" @click="handleDown(row)">
             下架
+          </el-button>
+          <el-button v-else type="success" size="mini" @click="handleUp(row)">
+            上架
           </el-button>
           <el-button size="mini" style="width: 80px" type="info" @click="handleSection(row,'deleted')">
             章节管理
@@ -102,7 +106,7 @@
 </template>
 
 <script>
-import { infoSearch, infoAdd, infoSet, infoDown } from '@/api/manhua'
+import { infoSearch, infoAdd, infoSet, infoDown, infoUp, infoDel } from '@/api/manhua'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -183,7 +187,8 @@ export default {
       this.listLoading = true
       infoSearch({
         pageNo: this.listQuery.page,
-        pageSize: this.listQuery.limit
+        pageSize: this.listQuery.limit,
+        search: this.listQuery.title
       }).then(response => {
         this.list = response.data.records
         this.total = response.data.total
@@ -223,6 +228,9 @@ export default {
       }
       this.handleFilter()
     },
+    loadError(e) {
+      e.target.src = require('@/assets/404_images/404.png')
+    },
     resetTemp() {
       this.temp = {
         id: undefined,
@@ -232,11 +240,42 @@ export default {
       }
     },
     handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+      this.$router.push({
+        path: '/comic-cont/comic/create'
+      })
+    },
+    handleDown(row) {
+      this.$confirm('是否确认下架', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        infoDown({ id: row.id }).then(() => {
+          this.refresh()
+          this.$notify({
+            title: 'Success',
+            message: '下架成功',
+            type: 'danger',
+            duration: 2000
+          })
+        })
+      })
+    },
+    handleUp(row) {
+      this.$confirm('是否确认上架', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        infoUp({ id: row.id }).then(() => {
+          this.refresh()
+          this.$notify({
+            title: 'Success',
+            message: '上架成功',
+            type: 'danger',
+            duration: 2000
+          })
+        })
       })
     },
     handleDelete(row) {
@@ -245,7 +284,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        infoDown({ id: row.id }).then(() => {
+        infoDel({ id: row.id }).then(() => {
           this.refresh()
           this.$notify({
             title: 'Success',
@@ -274,12 +313,8 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+      this.$router.push({
+        path: '/comic-cont/comic/edit/' + row.id
       })
     },
     updateData() {

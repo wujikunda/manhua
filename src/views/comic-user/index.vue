@@ -5,9 +5,6 @@
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-        新建
-      </el-button>
     </div>
 
     <el-table
@@ -45,12 +42,15 @@
       <el-table-column label="操作" align="center" width="330" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            详情
+            查看
           </el-button>
           <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,'deleted')">
             删除
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,'deleted')">
+          <el-button v-if="row.enable" type="warning" size="mini" @click="handleDown(row)">
+            禁用
+          </el-button>
+          <el-button v-else type="success" size="mini" @click="handleUp(row)">
             解禁
           </el-button>
         </template>
@@ -108,7 +108,7 @@
 </template>
 
 <script>
-import { userSearch, categoryAdd, userGetState } from '@/api/manhua'
+import { userSearch, categoryAdd, userDelete, userDisable, userEnable } from '@/api/manhua'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -189,7 +189,8 @@ export default {
       this.listLoading = true
       userSearch({
         pageNo: this.listQuery.page,
-        pageSize: this.listQuery.limit
+        pageSize: this.listQuery.limit,
+        search: this.listQuery.title
       }).then(response => {
         this.list = response.data.records
         this.total = response.data.total
@@ -202,6 +203,40 @@ export default {
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
+    },
+    handleDown(row) {
+      this.$confirm('是否确认禁用', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        userDisable({ id: row.id }).then(() => {
+          this.refresh()
+          this.$notify({
+            title: 'Success',
+            message: '禁用成功',
+            type: 'danger',
+            duration: 2000
+          })
+        })
+      })
+    },
+    handleUp(row) {
+      this.$confirm('是否确认解禁', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        userEnable({ id: row.id }).then(() => {
+          this.refresh()
+          this.$notify({
+            title: 'Success',
+            message: '解禁成功',
+            type: 'danger',
+            duration: 2000
+          })
+        })
+      })
     },
     handleModifyStatus(row, status) {
       this.$message({
@@ -246,7 +281,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        userGetState({ id: row.id, enable: false }).then(() => {
+        userDelete({ id: row.id, enable: false }).then(() => {
           this.refresh()
           this.$notify({
             title: 'Success',
@@ -285,22 +320,11 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          userGetState(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: '保存成功',
-              type: 'success',
-              duration: 2000
-            })
+          this.$notify({
+            title: 'Success',
+            message: '保存成功',
+            type: 'success',
+            duration: 2000
           })
         }
       })

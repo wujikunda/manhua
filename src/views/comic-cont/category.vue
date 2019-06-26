@@ -140,7 +140,7 @@ export default {
         page: 1,
         limit: 20,
         importance: undefined,
-        title: undefined,
+        title: '',
         type: undefined,
         sort: '+id'
       },
@@ -177,7 +177,8 @@ export default {
       this.listLoading = true
       categorySearch({
         pageNo: this.listQuery.page,
-        pageSize: this.listQuery.limit
+        pageSize: this.listQuery.limit,
+        search: this.listQuery.title
       }).then(response => {
         this.list = response.data.records
         this.total = response.data.total

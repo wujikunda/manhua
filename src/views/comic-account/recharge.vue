@@ -5,9 +5,6 @@
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-        新建
-      </el-button>
     </div>
 
     <el-table
@@ -32,12 +29,12 @@
       </el-table-column>
       <el-table-column label="提现金额" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.amount }}</span>
+          <span>{{ scope.row.total }}</span>
         </template>
       </el-table-column>
       <el-table-column label="账户余额" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.total }}</span>
+          <span>{{ scope.row.amount }}</span>
         </template>
       </el-table-column>
       <el-table-column label="提现状态" class-name="status-col" width="100">
@@ -172,7 +169,8 @@ export default {
       this.listLoading = true
       userRechargeSearch({
         pageNo: this.listQuery.page,
-        pageSize: this.listQuery.limit
+        pageSize: this.listQuery.limit,
+        search: this.listQuery.title
       }).then(response => {
         this.list = response.data.records
         this.total = response.data.total

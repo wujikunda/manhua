@@ -73,22 +73,31 @@ export function infoGet(params) {
     method: 'get'
   })
 }
+export function infoDel(params) {
+  return request({
+    url: '/book/info/' + params.id,
+    method: 'delete',
+    data: params || {}
+  })
+}
+
 export function infoSet(params) {
   return request({
     url: '/book/info/' + params.id,
-    method: 'put'
+    method: 'put',
+    data: params || {}
   })
 }
 export function infoUp(params) {
   return request({
-    url: '/book/info/' + params.id + '/delisting',
-    method: 'delete'
+    url: '/book/info/' + params.id + '/listing',
+    method: 'put'
   })
 }
 export function infoDown(params) {
   return request({
-    url: '/book/info/' + params.id + '/listing',
-    method: 'delete'
+    url: '/book/info/' + params.id + '/delisting',
+    method: 'put'
   })
 }
 
@@ -140,6 +149,27 @@ export function userDetail(params) {
     url: '/user/info/' + params.id,
     method: 'get',
     params: params
+  })
+}
+export function userDelete(params) {
+  return request({
+    url: '/user/info/' + params.id,
+    method: 'delete',
+    data: params
+  })
+}
+export function userDisable(params) {
+  return request({
+    url: '/user/info/' + params.id + '/status/disable',
+    method: 'put',
+    data: params
+  })
+}
+export function userEnable(params) {
+  return request({
+    url: '/user/info/' + params.id + '/status/enable',
+    method: 'put',
+    data: params
   })
 }
 export function userGetState(params) {
@@ -236,12 +266,54 @@ export function sectionGet(params) {
 export function sectionSet(params) {
   return request({
     url: '/book/section/' + params.id,
-    method: 'put'
+    method: 'put',
+    data: params
   })
 }
 export function sectionDel(params) {
   return request({
-    url: '/book/category/' + params.id,
+    url: '/book/section/' + params.id,
     method: 'delete'
   })
+}
+
+// 营销模块
+export function marketingSearch(params) {
+  return request({
+    url: '/marketing',
+    method: 'get',
+    params: params
+  })
+}
+export function marketingAdd(params) {
+  return request({
+    url: '/marketing',
+    method: 'post',
+    data: params
+  })
+}
+export function marketingSet(params) {
+  return request({
+    url: '/marketing/' + params.id,
+    method: 'put',
+    data: params
+  })
+}
+
+export function marketingDel(params) {
+  return request({
+    url: '/marketing/' + params.id,
+    method: 'delete',
+    data: params
+  })
+}
+
+// 获取token
+export async function getQiNiuToken(params) {
+  const res = await request({
+    url: '/qiniu/upload-token',
+    method: 'get',
+    params: params || {}
+  })
+  return res
 }

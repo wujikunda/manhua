@@ -37,7 +37,7 @@
       </el-table-column>
       <el-table-column label="第几章节" width="110px" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.cover }}</span>
+          <span>{{ scope.row.sort }}</span>
         </template>
       </el-table-column>
       <el-table-column label="是否上架" class-name="status-col" width="100">
@@ -54,9 +54,6 @@
           </el-button>
           <el-button size="mini" type="danger" @click="handleDelete(row,'deleted')">
             删除
-          </el-button>
-          <el-button type="warning" size="mini" @click="handleUpdate(row)">
-            下架
           </el-button>
         </template>
       </el-table-column>
@@ -78,7 +75,6 @@
         <el-form-item label="是否上架" prop="sort">
           <el-switch v-model="temp.enable" active-color="#13ce66" inactive-color="#ff4949" />
         </el-form-item>
-        <tinymce v-model="temp.comment" :height="960" />
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -105,7 +101,6 @@
 <script>
 import { sectionSearch, sectionAdd, sectionSet, sectionDel } from '@/api/manhua'
 import waves from '@/directive/waves' // waves directive
-import Tinymce from '@/components/Tinymce'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 const calendarTypeOptions = [
@@ -123,7 +118,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 
 export default {
   name: 'SectionList',
-  components: { Pagination, Tinymce },
+  components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -161,7 +156,7 @@ export default {
         id: undefined,
         name: '',
         enable: false,
-        sort: 0
+        sort: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -178,15 +173,16 @@ export default {
     }
   },
   created() {
-    this.getList(this.$route.params.id)
+    this.getList()
   },
   methods: {
     getList(id) {
       this.listLoading = true
       sectionSearch({
-        bookId: id,
+        bookId: this.$route.params.id,
         pageNo: this.listQuery.page,
-        pageSize: this.listQuery.limit
+        pageSize: this.listQuery.limit,
+        search: this.listQuery.title
       }).then(response => {
         this.list = response.data.records
         this.total = response.data.total
@@ -230,7 +226,12 @@ export default {
       }
     },
     handleCreate() {
-      this.$router.push('/comic-cont/section/add')
+      this.$router.push({
+        path: '/comic-cont/section/add',
+        query: {
+          id: this.$route.params.id
+        }
+      })
     },
     handleDelete(row) {
       this.$confirm('是否确认删除', '提示', {
@@ -267,12 +268,11 @@ export default {
       })
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row) // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp)
-      this.dialogStatus = 'update'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
+      this.$router.push({
+        path: '/comic-cont/section/edit/' + row.id,
+        query: {
+          id: this.$route.params.id
+        }
       })
     },
     updateData() {

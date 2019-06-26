@@ -1,6 +1,6 @@
 <template>
-  <div class="app-container">
-    <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="width: 400px; margin-left:50px;">
+  <div v-loading="listLoading" class="app-container">
+    <el-form ref="dataForm" :model="temp" label-position="left" label-width="80px" style=" margin-left:50px;">
       <el-form-item label="标题" prop="name">
         <el-input v-model="temp.name" />
       </el-form-item>
@@ -8,18 +8,26 @@
         <el-input v-model="temp.sort" />
       </el-form-item>
       <el-form-item label="章节费用" prop="sort">
-        <el-input v-model="temp.sort" />
+        <el-input v-model="temp.price" />
       </el-form-item>
       <el-form-item label="是否上架" prop="sort">
-        <el-switch v-model="temp.enable" active-color="#13ce66" inactive-color="#ff4949" />
+        <el-switch v-model="temp.listing" active-color="#13ce66" inactive-color="#ff4949" />
       </el-form-item>
-      <tinymce v-model="temp.comment" :height="960" />
+      <tinymce v-model="temp.content" :height="660" />
     </el-form>
+    <div slot="footer" style=" margin:20px 50px;" class="dialog-footer">
+      <el-button @click="$router.back()">
+        取消
+      </el-button>
+      <el-button type="primary" @click="editState==='create'?createData():updateData()">
+        保存
+      </el-button>
+    </div>
   </div>
 </template>
 
 <script>
-import { infoSearch, infoAdd, infoSet, infoDown } from '@/api/manhua'
+import { sectionAdd, sectionGet, sectionSet } from '@/api/manhua'
 import Tinymce from '@/components/Tinymce'
 
 export default {
@@ -29,56 +37,38 @@ export default {
   },
   data() {
     return {
+      editState: 'create',
       temp: {
         id: undefined,
         name: '',
-        enable: false,
-        sort: 0
+        listing: false,
+        sort: '',
+        price: '',
+        content: ''
       }
     }
   },
-  created() {
+  async created() {
+    if (this.$route.params.id) {
+      this.listLoading = true
+      this.editState = 'edit'
+      await this.init()
+    }
     this.getList()
   },
   methods: {
+    async init() {
+      const res = await sectionGet({ id: this.$route.params.id })
+      this.temp = Object.assign({}, this.temp, res.data)
+      this.listLoading = false
+      // this.temp.bookGalleryDTOList = this.temp.bookGalleryList
+      // this.temp.lableList = this.temp.bookLableList.map(item => item.id)
+    },
     getList() {
-      this.listLoading = true
-      infoSearch({
-        pageNo: this.listQuery.page,
-        pageSize: this.listQuery.limit
-      }).then(response => {
-        this.list = response.data.records
-        this.total = response.data.total
-        this.listLoading = false
-      })
+      this.listLoading = false
     },
     refresh() {
       this.getList()
-    },
-    handleFilter() {
-      this.listQuery.page = 1
-      this.getList()
-    },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
-      row.status = status
-    },
-    sortChange(data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
-      } else {
-        this.listQuery.sort = '-id'
-      }
-      this.handleFilter()
     },
     resetTemp() {
       this.temp = {
@@ -88,36 +78,12 @@ export default {
         sort: 0
       }
     },
-    handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    handleDelete(row) {
-      this.$confirm('是否确认删除', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        infoDown({ id: row.id }).then(() => {
-          this.refresh()
-          this.$notify({
-            title: 'Success',
-            message: '删除成功',
-            type: 'danger',
-            duration: 2000
-          })
-        })
-      })
-    },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           console.log('this.temp', this.temp)
-          infoAdd(this.temp).then(() => {
+          this.temp.bookId = this.$route.query.id
+          sectionAdd(this.temp).then(() => {
             this.refresh()
             this.dialogFormVisible = false
             this.$notify({
@@ -126,8 +92,14 @@ export default {
               type: 'success',
               duration: 2000
             })
+            this.closeSelectedTag()
           })
         }
+      })
+    },
+    closeSelectedTag() {
+      this.$store.dispatch('tagsView/delView', this.$route).then(({ visitedViews }) => {
+        this.$router.back()
       })
     },
     handleUpdate(row) {
@@ -143,14 +115,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          infoSet(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
+          sectionSet(tempData).then(() => {
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',
@@ -158,6 +123,7 @@ export default {
               type: 'success',
               duration: 2000
             })
+            this.closeSelectedTag()
           })
         }
       })

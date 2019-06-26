@@ -193,3 +193,53 @@ aside {
 .multiselect--active {
   z-index: 1000 !important;
 }
+.avatar-uploader{
+  .el-upload{
+      position: relative;
+      width: 180px;
+      height: 180px;
+      line-height: 178px;
+      text-align: center;
+      border: 1px dashed #d9d9d9;
+      border-radius: 6px;
+      cursor: pointer;
+      overflow: hidden;
+      box-sizing: border-box;
+  }
+  .avatar-uploader-icon{
+      font-size: 28px;
+      color: #8c939d;
+  }
+  img, video{
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      max-width: 100%;
+      max-height: 100%;
+      transform: translate(-50%, -50%);
+  }
+}
+.el-form .el-date-editor, .el-form .el-input, .el-form .el-select, .el-form .el-textarea {
+  width: 500px;
+}
+.imgList{
+  display: flex;
+  flex-wrap: wrap;
+  .imgBox{
+    position: relative;
+    margin-right: 15px;
+    .imgItem{
+      max-width: 150px;
+      max-height: 150px;
+    }
+    .imgDelete{
+      cursor: pointer;
+      position: absolute;
+      right: -10px;
+      top: -10px;
+      width: 20px;
+      z-index: 2;
+    }
+  }
+
+}

@@ -183,7 +183,7 @@ export default {
     imageSuccessCBK(arr) {
       const _this = this
       arr.forEach(v => {
-        window.tinymce.get(_this.tinymceId).insertContent(`<img class="wscnph" src="${v.url}" >`)
+        window.tinymce.get(_this.tinymceId).insertContent(`<img style="width: 100%" src="${v.url}" >`)
       })
     }
   }

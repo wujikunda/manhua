@@ -1,10 +1,10 @@
 <template>
   <div class="upload-container">
     <el-button :style="{background:color,borderColor:color}" icon="el-icon-upload" size="mini" type="primary" @click=" dialogVisible=true">
-      upload
+      上传图片
     </el-button>
     <el-dialog :visible.sync="dialogVisible">
-      <el-upload
+      <!-- <el-upload
         :multiple="true"
         :file-list="fileList"
         :show-file-list="true"
@@ -14,26 +14,33 @@
         class="editor-slide-upload"
         action="https://httpbin.org/post"
         list-type="picture-card"
-      >
-        <el-button size="small" type="primary">
-          Click upload
-        </el-button>
-      </el-upload>
+      > -->
+      <div class="imgList" style="margin-bottom: 15px;">
+        <div v-for="(item, index) in fileList" :key="index" class="imgBox">
+          <img class="imgItem" :src="item.pic" @click="preView(item.pic)">
+          <img class="imgDelete" :src="require('@/assets/404_images/button_shanchu.png')" @click="fileList.splice(index, 1)">
+        </div>
+        <img class="imgItem" :src="require('@/assets/404_images/img_upload.png')" @click="upLoadImg('list')">
+      </div>
+      <!-- </el-upload> -->
       <el-button @click="dialogVisible = false">
-        Cancel
+        取消
       </el-button>
       <el-button type="primary" @click="handleSubmit">
-        Confirm
+        确定
       </el-button>
     </el-dialog>
+    <qiniu ref="uploadFiles" class="needsclick" @selectFinish="getUploadImg"></qiniu>
   </div>
 </template>
 
 <script>
-// import { getToken } from 'api/qiniu'
-
+import qiniu from '@/components/qiniu/qiniu'
 export default {
   name: 'EditorSlideUpload',
+  components: {
+    qiniu
+  },
   props: {
     color: {
       type: String,
@@ -48,16 +55,25 @@ export default {
     }
   },
   methods: {
+    getUploadImg(url, file, type) {
+      this.fileList.push({
+        pic: url,
+        url: url
+      })
+    },
+    upLoadImg(type) {
+      this.$refs.uploadFiles.museClick(type)
+    },
     checkAllSuccess() {
       return Object.keys(this.listObj).every(item => this.listObj[item].hasSuccess)
     },
     handleSubmit() {
-      const arr = Object.keys(this.listObj).map(v => this.listObj[v])
-      if (!this.checkAllSuccess()) {
-        this.$message('Please wait for all images to be uploaded successfully. If there is a network problem, please refresh the page and upload again!')
-        return
-      }
-      this.$emit('successCBK', arr)
+      // const arr = Object.keys(this.listObj).map(v => this.listObj[v])
+      // if (!this.checkAllSuccess()) {
+      //   this.$message('Please wait for all images to be uploaded successfully. If there is a network problem, please refresh the page and upload again!')
+      //   return
+      // }
+      this.$emit('successCBK', this.fileList)
       this.listObj = {}
       this.fileList = []
       this.dialogVisible = false
@@ -104,6 +120,17 @@ export default {
 <style lang="scss" scoped>
 .editor-slide-upload {
   margin-bottom: 20px;
+  background-color: #fbfdff;
+  border: 1px dashed #c0ccda;
+  border-radius: 6px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 148px;
+  text-align: center;
+  height: 148px;
+  cursor: pointer;
+  line-height: 146px;
+  vertical-align: top;
   /deep/ .el-upload--picture-card {
     width: 100%;
   }

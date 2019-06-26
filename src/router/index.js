@@ -99,6 +99,7 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/icons/index'),
         name: 'Icons',
+        hidden: true,
         meta: { title: 'Icons', icon: 'icon', noCache: true }
       }
     ]
@@ -179,7 +180,7 @@ export const asyncRoutes = [
       {
         path: 'section/add',
         component: () => import('@/views/comic-cont/section-add'),
-        name: 'sectionEdit',
+        name: 'sectionAdd',
         meta: { title: '章节新增', noCache: true, activeMenu: '/comic-cont/section' },
         hidden: true
       },
@@ -205,7 +206,7 @@ export const asyncRoutes = [
     name: '用户中心',
     meta: {
       title: '用户中心',
-      icon: 'table'
+      icon: 'peoples'
     },
     children: [
       {
@@ -219,7 +220,7 @@ export const asyncRoutes = [
         path: 'index',
         component: () => import('@/views/comic-user/index'),
         name: 'comic-user',
-        meta: { title: '用户中心', icon: 'list' }
+        meta: { title: '用户中心', icon: 'peoples' }
       }
     ]
   },
@@ -230,7 +231,7 @@ export const asyncRoutes = [
     name: '账户中心',
     meta: {
       title: '账户中心',
-      icon: 'table'
+      icon: 'money'
     },
     children: [
       {
@@ -279,7 +280,7 @@ export const asyncRoutes = [
     name: '设置中心',
     meta: {
       title: '设置中心',
-      icon: 'table'
+      icon: 'theme'
     },
     children: [
       {
