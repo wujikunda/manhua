@@ -57,15 +57,25 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="图书名称" prop="name">
-          <el-input v-model="temp.label" />
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="margin-left:50px;">
+        <el-form-item label="图书名称">
+          <el-autocomplete
+            v-model="temp.label"
+            :fetch-suggestions="querySearchAsync"
+            placeholder="请选择图书(可输入搜素)"
+            @select="handleSelect"
+          ></el-autocomplete>
         </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input v-model="temp.sort" />
         </el-form-item>
-        <el-form-item label="入口" prop="description">
-          <el-input v-model="temp.description" />
+        <el-form-item label="入口" prop="type">
+          <!-- <el-checkbox-group v-model="temp.label" style="width: 100%">
+            <el-checkbox v-for="(item, index) in entryList" :key="index" :label="item.type">{{ item.value }}</el-checkbox>
+          </el-checkbox-group> -->
+          <el-radio-group v-model="temp.type">
+            <el-radio v-for="(item, index) in entryList" :key="index" :label="item.type">{{ item.value }}</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item label="是否可用" prop="enable">
           <el-switch v-model="temp.enable" active-color="#13ce66" inactive-color="#ff4949" />
@@ -94,7 +104,7 @@
 </template>
 
 <script>
-import { marketingSearch, marketingAdd, marketingDel, marketingSet } from '@/api/manhua'
+import { marketingSearch, marketingAdd, marketingDel, marketingSet, infoSearch } from '@/api/manhua'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -142,6 +152,25 @@ export default {
         type: undefined,
         sort: '+id'
       },
+      entryList: [
+        {
+          type: 'MARKETING_CENTER',
+          value: '消息中心'
+        },
+        {
+          type: 'HOT_SEARCH',
+          value: '热门搜索'
+        },
+        {
+          type: 'HOT_RECOMMEND',
+          value: '热门推荐'
+        },
+        {
+          type: 'SCROLLBAR',
+          value: '滚动条'
+        }
+      ],
+      comicList: [],
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
@@ -162,13 +191,14 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
-        name: [{ required: true, message: '名称不能为空', trigger: 'blur' }]
+        label: [{ required: true, message: '名称不能为空', trigger: 'blur' }]
       },
       downloadLoading: false
     }
   },
   created() {
     this.getList()
+    // this.initComic()
   },
   methods: {
     getList() {
@@ -189,6 +219,45 @@ export default {
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
+    },
+    initComic() {
+      infoSearch({
+        pageNo: 1,
+        pageSize: 20,
+        isEnable: true
+      }).then(response => {
+        this.comicList = response.data.records.map(item => {
+          item.value = item.name
+          return item
+        })
+        this.listLoading = false
+      })
+    },
+    async querySearchAsync(queryString, cb) {
+      infoSearch({
+        pageNo: 1,
+        pageSize: 10,
+        search: queryString
+      }).then(response => {
+        this.comicList = response.data.records.map(item => {
+          item.value = item.name
+          return item
+        })
+        this.listLoading = false
+        cb(this.comicList)
+      })
+      // var comicList = this.comicList
+      // var results = queryString ? comicList.filter(this.createStateFilter(queryString)) : comicList
+      // cb(results)
+    },
+    createStateFilter(queryString) {
+      return (state) => {
+        return (state.name.toLowerCase().indexOf(queryString.toLowerCase()) > -1)
+      }
+    },
+    handleSelect(item) {
+      this.temp.lebel = item.name
+      this.temp.value = item.id
     },
     handleModifyStatus(row, status) {
       this.$message({
