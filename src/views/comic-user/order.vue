@@ -17,36 +17,41 @@
       style="width: 100%;"
       @sort-change="sortChange"
     >
-      <el-table-column label="ID" prop="id" align="center" width="80">
-        <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+      <el-table-column label="下单时间" min-width="160px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.gmtCreate }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="微信号" min-width="150px">
+      <el-table-column label="交易流水" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.tradeNo }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="用户ID" min-width="110px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.userId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="提现金额" width="110px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.total }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="账户余额" width="110px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.amount }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="状态" class-name="status-col" width="100">
+      <el-table-column label="漫币" min-width="110px" align="center">
         <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
-            {{ row.status === 1 ? '成功' : '失败' }}
-          </el-tag>
+          <span>{{ row.amount }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="提现时间" width="150px" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.gmtCreate }}</span>
+      <el-table-column label="图书名称" min-width="150px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.bookName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="章节名称" min-width="150px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.sectionName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="130" class-name="small-padding fixed-width">
+        <template slot-scope="{row}">
+          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+            查看
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -54,24 +59,33 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="标签名称" prop="name">
-          <el-input v-model="temp.name" />
+      <el-form ref="dataForm" :model="temp" label-position="left" label-width="80px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="下单时间">
+          <span>{{ temp.gmtCreate }}</span>
         </el-form-item>
-        <el-form-item label="排序" prop="sort">
-          <el-input v-model="temp.sort" />
+        <el-form-item label="交易流水">
+          <span>{{ temp.tradeNo }}</span>
         </el-form-item>
-        <el-form-item label="是否可用" prop="sort">
-          <el-switch v-model="temp.enable" active-color="#13ce66" inactive-color="#ff4949" />
+        <el-form-item label="用户ID">
+          <span>{{ temp.userId }}</span>
+        </el-form-item>
+        <el-form-item label="漫币">
+          <span>{{ temp.amount }}</span>
+        </el-form-item>
+        <el-form-item label="图书名称">
+          <span>{{ temp.bookName }}</span>
+        </el-form-item>
+        <el-form-item label="章节名称">
+          <span>{{ temp.sectionName }}</span>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+        <!-- <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
           保存
-        </el-button>
+        </el-button> -->
       </div>
     </el-dialog>
 
@@ -88,7 +102,7 @@
 </template>
 
 <script>
-import { userWithdrawSearch, lableAdd, userWithdrawGet, lableDel } from '@/api/manhua'
+import { orderSearch, categoryAdd, userDelete, userDisable, userEnable } from '@/api/manhua'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -106,17 +120,17 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 }, {})
 
 export default {
-  name: 'Withdrawal',
+  name: 'UserOrder',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
-      const statusMap = {
-        1: 'success',
-        2: 'info',
-        3: 'danger'
-      }
-      return statusMap[status] // status ? 'success' : 'danger'
+      // const statusMap = {
+      //   published: 'success',
+      //   draft: 'info',
+      //   deleted: 'danger'
+      // }
+      return status ? 'success' : 'danger'
     },
     typeFilter(type) {
       return calendarTypeKeyValue[type]
@@ -167,7 +181,7 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      userWithdrawSearch({
+      orderSearch({
         pageNo: this.listQuery.page,
         pageSize: this.listQuery.limit,
         search: this.listQuery.title
@@ -183,6 +197,40 @@ export default {
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
+    },
+    handleDown(row) {
+      this.$confirm('是否确认禁用', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        userDisable({ id: row.id }).then(() => {
+          this.refresh()
+          this.$notify({
+            title: 'Success',
+            message: '禁用成功',
+            type: 'danger',
+            duration: 2000
+          })
+        })
+      })
+    },
+    handleUp(row) {
+      this.$confirm('是否确认解禁', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        userEnable({ id: row.id }).then(() => {
+          this.refresh()
+          this.$notify({
+            title: 'Success',
+            message: '解禁成功',
+            type: 'danger',
+            duration: 2000
+          })
+        })
+      })
     },
     handleModifyStatus(row, status) {
       this.$message({
@@ -227,7 +275,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        lableDel({ id: row.id }).then(() => {
+        userDelete({ id: row.id, enable: false }).then(() => {
           this.refresh()
           this.$notify({
             title: 'Success',
@@ -241,8 +289,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          console.log('this.temp', this.temp)
-          lableAdd(this.temp).then(() => {
+          categoryAdd(this.temp).then(() => {
             this.refresh()
             this.dialogFormVisible = false
             this.$notify({
@@ -267,22 +314,11 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          userWithdrawGet(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: '保存成功',
-              type: 'success',
-              duration: 2000
-            })
+          this.$notify({
+            title: 'Success',
+            message: '保存成功',
+            type: 'success',
+            duration: 2000
           })
         }
       })

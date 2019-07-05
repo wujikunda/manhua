@@ -39,8 +39,8 @@
         <el-switch v-model="temp.listing" active-color="#13ce66" inactive-color="#ff4949" />
       </el-form-item>
       <el-form-item label="封面logo:" prop="image">
-        <div class="centerForm" @click="upLoadImg('cover')">
-          <img :src="temp.cover ? temp.cover : require('@/assets/404_images/img_upload.png')" alt="" @click="upLoadImg('pic')">
+        <div class="centerForm">
+          <img :src="temp.cover ? temp.cover : require('@/assets/404_images/img_upload.png')" alt="" @click="upLoadImg('cover')">
         </div>
       </el-form-item>
       <el-form-item label="主图:" prop="image">
@@ -157,7 +157,8 @@ export default {
       }
       if (type === 'list') {
         this.temp.bookGalleryDTOList.push({
-          pic: url
+          pic: url,
+          sort: this.temp.bookGalleryDTOList.length
         })
       }
       console.log('url', url, type)

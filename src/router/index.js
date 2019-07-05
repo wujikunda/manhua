@@ -225,6 +225,24 @@ export const asyncRoutes = [
     ]
   },
   {
+    path: '/comic-order',
+    component: Layout,
+    redirect: '/comic-order/index',
+    name: '订单列表',
+    meta: {
+      title: '订单列表',
+      icon: 'list'
+    },
+    children: [
+      {
+        path: 'order',
+        component: () => import('@/views/comic-user/order'),
+        name: 'comic-user-order',
+        meta: { title: '订单列表', icon: 'list' }
+      }
+    ]
+  },
+  {
     path: '/comic-account',
     component: Layout,
     redirect: '/comic-account/index',

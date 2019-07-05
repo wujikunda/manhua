@@ -73,7 +73,7 @@
         <el-form-item label="微信头像">
           <span><img class="user-header" :src="temp.wechatHeadImg || require('@/assets/default.png')"></span>
         </el-form-item>
-        <el-form-item label="邀请人">
+        <el-form-item label="邀请码">
           <span>{{ temp.referralCode }}</span>
         </el-form-item>
         <el-form-item label="创建时间">

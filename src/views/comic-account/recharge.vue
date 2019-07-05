@@ -27,7 +27,7 @@
           <span>{{ row.userId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="提现金额" width="110px" align="center">
+      <el-table-column label="充值金额" width="110px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.total }}</span>
         </template>
@@ -37,14 +37,14 @@
           <span>{{ scope.row.amount }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="提现状态" class-name="status-col" width="100">
+      <el-table-column label="状态" class-name="status-col" width="100">
         <template slot-scope="{row}">
           <el-tag :type="row.status | statusFilter">
             {{ row.status === 1 ? '成功' : '失败' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="提现时间" width="150px" align="center">
+      <el-table-column label="充值时间" width="150px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.gmtCreate }}</span>
         </template>

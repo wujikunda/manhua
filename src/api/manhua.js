@@ -308,6 +308,30 @@ export function marketingDel(params) {
   })
 }
 
+// 订单模块
+export function getHomeData(params) {
+  return request({
+    url: '/home',
+    method: 'get',
+    params: params
+  })
+}
+export function orderSearch(params) {
+  return request({
+    url: '/order/info',
+    method: 'get',
+    params: params
+  })
+}
+
+export function orderInfo(params) {
+  return request({
+    url: '/order/info/' + params.id,
+    method: 'get',
+    data: params
+  })
+}
+
 // 获取token
 export async function getQiNiuToken(params) {
   const res = await request({
