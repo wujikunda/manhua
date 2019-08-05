@@ -58,31 +58,36 @@ export default {
       const list = this.$refs.file.files
       for (let i = 0; i < list.length; i++) {
         if (!this.isContain(list[i])) {
+          // list[i].name = list[i] + new Date().getTime()
+          console.log('list[i].name', list[i].name)
           const item = {
             name: list[i].name,
             size: list[i].size,
             file: list[i]
           }
           const _this = this
+          console.log('list[i]', list[i])
           iMlrz(list[i], {
             // quality: 0.9,
             // width: 600,
-            fieldName: 'headimg'
+            // fieldName: 'headimg'
           }).then(function(rst) {
-            const observable = qiniu.upload(rst.file, 'upf' + new Date().getTime(), _this.token, _this.putExtra, _this.config)
-            observable.subscribe({
-              next(res) {
-                // console.log('next', res)
-              },
-              error(err) {
-                console.log('err', err)
-                loadingLog.close()
-              },
-              complete(res) {
-                loadingLog.close()
-                _this.$emit('selectFinish', _this.domain + '/' + res.key, rst, _this.type)
-              }
-            })
+            setTimeout(() => {
+              const observable = qiniu.upload(rst.file, 'upf' + new Date().getTime(), _this.token, _this.putExtra, _this.config)
+              observable.subscribe({
+                next(res) {
+                  // console.log('next', res)
+                },
+                error(err) {
+                  console.log('err', err)
+                  loadingLog.close()
+                },
+                complete(res) {
+                  loadingLog.close()
+                  _this.$emit('selectFinish', _this.domain + '/' + res.key, rst, _this.type)
+                }
+              })
+            }, i * 50)
           }).catch(function(err) {
             console.log('err', err)
             loadingLog.close()
