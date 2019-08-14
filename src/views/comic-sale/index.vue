@@ -2,6 +2,9 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="listQuery.title" placeholder="名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-select v-model="listQuery.type" placeholder="类型" clearable class="filter-item" style="width: 130px">
+        <el-option v-for="item in entryList" :key="item.type" :label="item.value" :value="item.type" />
+      </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
@@ -206,7 +209,8 @@ export default {
       marketingSearch({
         pageNo: this.listQuery.page,
         pageSize: this.listQuery.limit,
-        search: this.listQuery.title
+        lable: this.listQuery.title,
+        type: this.listQuery.type
       }).then(response => {
         this.list = response.data.records
         this.total = response.data.total
@@ -237,7 +241,8 @@ export default {
       infoSearch({
         pageNo: 1,
         pageSize: 10,
-        search: queryString
+        lable: queryString,
+        type: this.listQuery.type
       }).then(response => {
         this.comicList = response.data.records.map(item => {
           item.value = item.name

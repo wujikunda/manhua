@@ -19,6 +19,7 @@
         <div v-for="(item, index) in fileList" :key="index" class="imgBox">
           <img class="imgItem" :src="item.pic" @click="preView(item.pic)">
           <img class="imgDelete" :src="require('@/assets/404_images/button_shanchu.png')" @click="fileList.splice(index, 1)">
+          <span v-if="item.name">{{ item.name }}</span>
         </div>
         <img class="imgItem" :src="require('@/assets/404_images/img_upload.png')" @click="upLoadImg('list')">
       </div>
@@ -58,7 +59,8 @@ export default {
     getUploadImg(url, file, type) {
       this.fileList.push({
         pic: url,
-        url: url
+        url: url,
+        name: file.origin.name
       })
     },
     upLoadImg(type) {
@@ -134,5 +136,11 @@ export default {
   /deep/ .el-upload--picture-card {
     width: 100%;
   }
+}
+.imgBox{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 </style>

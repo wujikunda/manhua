@@ -56,17 +56,16 @@ export default {
         background: 'rgba(0, 0, 0, 0.7)'
       })
       const list = this.$refs.file.files
+      const listLength = list.length
+      let sortImg = []
       for (let i = 0; i < list.length; i++) {
         if (!this.isContain(list[i])) {
-          // list[i].name = list[i] + new Date().getTime()
-          console.log('list[i].name', list[i].name)
           const item = {
             name: list[i].name,
             size: list[i].size,
             file: list[i]
           }
           const _this = this
-          console.log('list[i]', list[i])
           iMlrz(list[i], {
             // quality: 0.9,
             // width: 600,
@@ -83,8 +82,20 @@ export default {
                   loadingLog.close()
                 },
                 complete(res) {
-                  loadingLog.close()
-                  _this.$emit('selectFinish', _this.domain + '/' + res.key, rst, _this.type)
+                  console.log('listLength', listLength)
+                  if (listLength === 1) {
+                    _this.$emit('selectFinish', _this.domain + '/' + res.key, rst, _this.type, i)
+                    loadingLog.close()
+                  } else {
+                    sortImg.push({ pic: _this.domain + '/' + res.key, file: rst, index: i })
+                    if (sortImg.length === listLength) {
+                      sortImg = sortImg.sort((a, b) => a.index - b.index)
+                      sortImg.forEach((item, j) => {
+                        _this.$emit('selectFinish', item.pic, item.file, _this.type, j)
+                        loadingLog.close()
+                      })
+                    }
+                  }
                 }
               })
             }, i * 50)

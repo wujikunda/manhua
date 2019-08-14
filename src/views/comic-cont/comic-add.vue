@@ -54,6 +54,7 @@
             <div v-for="(item, index) in temp.bookGalleryDTOList" :key="index" class="imgBox">
               <img class="imgItem" :src="item.pic" @click="preView(item.pic)">
               <img class="imgDelete" :src="require('@/assets/404_images/button_shanchu.png')" @click="temp.bookGalleryDTOList.splice(index, 1)">
+              <span v-if="item.name">{{ item.name }}</span>
             </div>
             <img class="imgItem" :src="require('@/assets/404_images/img_upload.png')" @click="upLoadImg('list')">
           </div>
@@ -148,7 +149,7 @@ export default {
     preView(url) {
       this.$refs.picPreview.setPicture(url)
     },
-    getUploadImg(url, file, type) {
+    getUploadImg(url, file, type, index) {
       if (type === 'cover') {
         this.temp.cover = url
       }
@@ -158,10 +159,10 @@ export default {
       if (type === 'list') {
         this.temp.bookGalleryDTOList.push({
           pic: url,
-          sort: this.temp.bookGalleryDTOList.length
+          sort: this.temp.bookGalleryDTOList.length,
+          name: file.origin.name
         })
       }
-      console.log('url', url, type)
     },
     upLoadImg(type) {
       this.$refs.uploadFiles.museClick(type)
@@ -280,6 +281,12 @@ export default {
   img{
     max-width: 160px;
     max-height: 160px;
+  }
+  .imgBox{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
   }
 }
 </style>

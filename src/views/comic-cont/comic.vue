@@ -188,7 +188,7 @@ export default {
       infoSearch({
         pageNo: this.listQuery.page,
         pageSize: this.listQuery.limit,
-        search: this.listQuery.title
+        bookName: this.listQuery.title
       }).then(response => {
         this.list = response.data.records
         this.total = response.data.total
